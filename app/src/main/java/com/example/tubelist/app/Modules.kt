@@ -22,6 +22,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 object Modules {
      val items = listOf(
         module {
+            single<IAppLogger> { TimberLogger }
             single<ISettings> { Settings(androidContext()) }
             single<ITokenStorage> { TokenStorage }
             single<Retrofit> {

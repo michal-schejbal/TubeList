@@ -19,11 +19,16 @@ coilCompose = "2.7.0"
 googleApiServicesYoutube = "v3-rev20250422-2.0.0"
 gson = "2.13.1"
 materialIconsExtended = "1.7.8"
+kotlinx-coroutines = "1.8.1"
+coreKtxVersion = "1.7.0-alpha03"
+coreTesting = "2.2.0"
+timber = "5.0.1"
 
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name="kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
@@ -51,7 +56,12 @@ coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coi
 google-api-services-youtube = { group = "com.google.apis", name = "google-api-services-youtube", version.ref = "googleApiServicesYoutube" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "materialIconsExtended" }
-
+koin-test = { group = "io.insert-koin", name = "koin-test", version.ref = "koin" }
+koin-test-junit4 = { group = "io.insert-koin", name = "koin-test-junit4", version.ref = "koin" }
+core-ktx = { group = "androidx.test", name = "core-ktx", version.ref = "coreKtxVersion" }
+androidx-core-testing = { group = "androidx.arch.core", name = "core-testing", version.ref = "coreTesting" }
+kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
+timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 
 
 [plugins]

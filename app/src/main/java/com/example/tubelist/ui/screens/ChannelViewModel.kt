@@ -19,6 +19,10 @@ class ChannelViewModel(private val repository: IYoutubeRepository) : ViewModel()
     val uiState: StateFlow<ChannelUiState> = _uiState
 
     fun getChannel(channelId: String) {
+        if (isCached(channelId)) {
+            return
+        }
+
         viewModelScope.launch {
             _uiState.value = ChannelUiState(isLoading = true)
             try {
@@ -28,5 +32,9 @@ class ChannelViewModel(private val repository: IYoutubeRepository) : ViewModel()
                 _uiState.value = ChannelUiState(error = e.message)
             }
         }
+    }
+
+    private fun isCached(channelId: String): Boolean {
+        return _uiState.value.channel?.channelId == channelId
     }
 }
