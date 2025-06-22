@@ -1,6 +1,6 @@
 package com.example.tubelist.ui
 
-import com.example.tubelist.app.IAppLogger
+import com.example.tubelist.app.logger.IAppLogger
 import com.example.tubelist.model.youtube.Channel
 import com.example.tubelist.model.youtube.IYoutubeRepository
 import com.example.tubelist.model.youtube.SubscriptionItem

@@ -1,4 +1,4 @@
-package com.example.tubelist.app
+package com.example.tubelist.app.tokens
 
 object TokenStorage : ITokenStorage {
     private val ID_TOKEN = "id_token"
@@ -14,7 +14,7 @@ object TokenStorage : ITokenStorage {
     }
 
     override fun setIdToken(idToken: String) {
-        this.idToken = idToken
+        TokenStorage.idToken = idToken
     }
 
     override fun getAccessToken(): String? {
@@ -22,7 +22,7 @@ object TokenStorage : ITokenStorage {
     }
 
     override fun setAccessToken(accessToken: String) {
-        this.accessToken = accessToken
+        TokenStorage.accessToken = accessToken
     }
 
     override fun clear() {

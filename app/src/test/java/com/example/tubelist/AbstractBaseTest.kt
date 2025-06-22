@@ -1,8 +1,10 @@
 package com.example.tubelist
 
-import com.example.tubelist.app.IAppLogger
+import com.example.tubelist.app.IDispatcherProvider
+import com.example.tubelist.app.TestDispatcherProvider
 import com.example.tubelist.app.TestLogger
 import com.example.tubelist.app.TestSettings
+import com.example.tubelist.app.logger.IAppLogger
 import com.example.tubelist.model.youtube.IYoutubeRepository
 import com.example.tubelist.ui.TestYoutubeRepository
 import com.example.tubelist.ui.TestYoutubeRepositoryConfig
@@ -35,6 +37,7 @@ abstract class AbstractBaseTest : KoinTest {
                 module {
                     single<IAppLogger> { TestLogger }
                     single<ISettings> { TestSettings() }
+                    single<IDispatcherProvider> { TestDispatcherProvider(testDispatcher) }
                 },
                 module {
                     factory<IYoutubeRepository> { TestYoutubeRepository() }
@@ -54,5 +57,6 @@ abstract class AbstractBaseTest : KoinTest {
     open fun conclude() {
         Dispatchers.resetMain()
         stopKoin()
+        testDispatcher.scheduler.advanceUntilIdle()
     }
 }

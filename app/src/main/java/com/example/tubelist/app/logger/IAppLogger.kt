@@ -1,4 +1,4 @@
-package com.example.tubelist.app
+package com.example.tubelist.app.logger
 
 enum class LogLevel(val priority: Int) {
     VERBOSE(android.util.Log.VERBOSE),

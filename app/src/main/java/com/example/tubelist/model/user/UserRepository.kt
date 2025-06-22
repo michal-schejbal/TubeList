@@ -2,7 +2,7 @@ package com.example.tubelist.model.user
 
 import android.content.Context
 import android.util.Base64
-import com.example.tubelist.app.ITokenStorage
+import com.example.tubelist.app.tokens.ITokenStorage
 import com.google.gson.Gson
 import org.koin.java.KoinJavaComponent.inject
 

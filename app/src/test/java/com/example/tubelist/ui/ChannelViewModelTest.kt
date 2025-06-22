@@ -7,25 +7,25 @@ import com.example.tubelist.ui.screens.ChannelViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
-import org.junit.Before
-import org.junit.Test
 import org.koin.java.KoinJavaComponent.inject
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ChannelViewModelTest : AbstractBaseTest() {
     private val repository: IYoutubeRepository by inject(IYoutubeRepository::class.java)
     private lateinit var viewModel: ChannelViewModel
 
-    @Before
+    @BeforeTest
     fun before() {
         viewModel = ChannelViewModel(repository)
     }
 
-    @After
+    @AfterTest
     fun after() {
     }
 

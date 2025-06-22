@@ -1,13 +1,16 @@
 package com.example.tubelist.model.youtube
 
-import com.example.tubelist.app.ITokenStorage
-import kotlinx.coroutines.Dispatchers
+import com.example.tubelist.app.IDispatcherProvider
+import com.example.tubelist.app.tokens.ITokenStorage
 import kotlinx.coroutines.withContext
 
-class YoutubeRepository(private val api: YoutubeApiService, private val tokenStorage: ITokenStorage) :
-    IYoutubeRepository {
+class YoutubeRepository(
+    private val api: YoutubeApiService,
+    private val tokenStorage: ITokenStorage,
+    private val dispatcher: IDispatcherProvider
+) : IYoutubeRepository {
     override suspend fun getSubscriptions(): List<SubscriptionItem> {
-        return withContext(Dispatchers.IO) {
+        return withContext(dispatcher.io) {
             val response =  api.getSubscriptions(authHeader = "Bearer ${tokenStorage.getAccessToken()}")
             response.items.map {
                 SubscriptionItem(
@@ -20,7 +23,7 @@ class YoutubeRepository(private val api: YoutubeApiService, private val tokenSto
     }
 
     override suspend fun getChannel(channelId: String): Channel? {
-        return withContext(Dispatchers.IO) {
+        return withContext(dispatcher.io) {
             val response = api.getChannel(
                 channelId = channelId,
                 authHeader = "Bearer ${tokenStorage.getAccessToken()}"
