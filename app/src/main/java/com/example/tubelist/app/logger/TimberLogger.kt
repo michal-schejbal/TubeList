@@ -4,7 +4,25 @@ import timber.log.Timber
 
 object TimberLogger : IAppLogger {
     init {
-        Timber.plant(Timber.DebugTree())
+        Timber.plant(object : Timber.DebugTree() {
+            override fun createStackElementTag(element: StackTraceElement): String {
+                val className = element.className.substringAfterLast('.').substringBefore('$')
+                return "$className:${element.lineNumber}"
+            }
+
+            override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+                val realElement = Throwable().stackTrace.firstOrNull {
+                    it.className != TimberLogger::class.java.name
+                }
+
+                val actualTag = realElement?.let {
+                    "${it.className.substringAfterLast('.')}:${it.lineNumber}"
+                } ?: tag ?: "unknown"
+
+                super.log(priority, actualTag, message, t)
+            }
+
+        })
     }
 
     override fun v(message: String, vararg args: Any?) = Timber.v(message, *args)

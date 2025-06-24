@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,18 +54,23 @@ internal fun ChannelScreenContent(
     state: ChannelUiState
 ) {
     Box(modifier = modifier.fillMaxSize()) {
-        when {
-            state.isLoading -> LoadingComponent()
+        when (state) {
+            is ChannelUiState.Loading -> LoadingComponent()
 
-            state.error != null -> Text(
-                text = "Error: ${state.error}",
+            is ChannelUiState.Error -> Text(
+                text = "Error: ${state.message}",
                 color = Color.Red,
                 modifier = Modifier.align(Alignment.Center)
             )
 
-            state.channel != null -> {
+            is ChannelUiState.Success -> {
                 val channel = state.channel
                 val scrollState = rememberScrollState()
+                val publishedDate = remember(channel.published) {
+                    channel.published.formatAsPublishedDate()
+                }
+
+
                 Column(
                     modifier = Modifier
                         .verticalScroll(scrollState)
@@ -91,11 +97,12 @@ internal fun ChannelScreenContent(
                             tint = Color.DarkGray
                         )
                     }
+
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(channel.title, style = MaterialTheme.typography.headlineSmall)
                     Spacer(modifier = Modifier.height(5.dp))
                     Text(
-                        text = "Published on ${channel.published.formatAsPublishedDate()}",
+                        text = "Published on $publishedDate",
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.Gray
                     )
@@ -111,11 +118,19 @@ internal fun ChannelScreenContent(
 @Composable
 fun ChannelScreenPreview() {
     ChannelScreenContent(
-        state = ChannelUiState(channel = Channel(
+        state = ChannelUiState.Success(channel = Channel(
             channelId = "cid",
             published = "2001-01-01T01:01:01Z",
             title = "Sample Channel",
             description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         ))
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ChannelScreenErrorPreview() {
+    ChannelScreenContent(
+        state = ChannelUiState.Error("Something went wrong")
     )
 }

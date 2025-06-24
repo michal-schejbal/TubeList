@@ -8,7 +8,6 @@ import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
 import androidx.credentials.exceptions.GetCredentialException
 import com.example.tubelist.app.Config
-import com.example.tubelist.app.tokens.ITokenStorage
 import com.google.android.gms.auth.GoogleAuthUtil
 import com.google.android.gms.auth.api.identity.AuthorizationRequest
 import com.google.android.gms.auth.api.identity.Identity
@@ -95,10 +94,8 @@ class AuthManager : IAuthManager {
             client.authorize(authorizationRequest)
                 .addOnSuccessListener { result ->
                     if (result.hasResolution() && result.pendingIntent != null) {
-                        // The user needs to grant consent. Tell the caller to launch the intent.
                         continuation.resume(AuthResult.ResolutionRequired(result.pendingIntent!!))
                     } else if (result.accessToken != null) {
-                        // Success, got the token immediately.
                         val token = result.accessToken!!
                         tokenStorage.setAccessToken(token)
                         continuation.resume(AuthResult.Success(token))
@@ -107,7 +104,6 @@ class AuthManager : IAuthManager {
                     }
                 }
                 .addOnFailureListener { e ->
-                    // The request failed.
                     continuation.resume(AuthResult.Error(e.message ?: "Authorization failed."))
                 }
         }
@@ -176,7 +172,6 @@ class AuthManager : IAuthManager {
 
         GoogleSignIn.getClient(context, gso).signOut()
             .addOnCompleteListener {
-                // Optional: notify UI or navigate to SignIn
             }
 
         GoogleSignIn.getClient(context, gso).revokeAccess()

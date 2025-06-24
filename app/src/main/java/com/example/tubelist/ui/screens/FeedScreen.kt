@@ -79,74 +79,94 @@ fun FeedScreenContent(
     onSortChange: (SortOption) -> Unit = {},
     onSearchChange: (String) -> Unit = {}
 ) {
+    Box(modifier = modifier.fillMaxSize()) {
+        when (uiState) {
+            is FeedUiState.Loading -> LoadingComponent()
+
+            is FeedUiState.Error -> Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "Error: ${uiState.message.orEmpty()}", color = Color.Red)
+            }
+
+            is FeedUiState.Success -> {
+                SubscriptionsList(modifier, uiState, onChannelClick, onSortChange, onSearchChange)
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun SubscriptionsList(
+    modifier: Modifier = Modifier,
+    uiState: FeedUiState.Success,
+    onChannelClick: (String) -> Unit = {},
+    onSortChange: (SortOption) -> Unit = {},
+    onSearchChange: (String) -> Unit = {}
+) {
     val searchSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var isSearchSheetVisible by remember { mutableStateOf(false) }
-
     val sortSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var isSortSheetVisible by remember { mutableStateOf(false) }
 
-    Box(modifier = modifier.fillMaxSize()) {
-        Column {
-            FilterComponent(
-                searchQuery = uiState.searchQuery,
-                sortOption = uiState.sortOption,
-                onSearchClick = {
-                    isSearchSheetVisible = true
-                },
-                onSortClick = {
-                    isSortSheetVisible = true
-                }
-            )
+    val searchQuery = uiState.searchQuery
+    val sortOption = uiState.sortOption
+    val subscriptions = uiState.subscriptions
 
-            when {
-                uiState.isLoading -> LoadingComponent()
-                uiState.subscriptions.isEmpty() -> Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(text = "No subscriptions found.")
-                    }
-                else -> LazyColumn {
-                    items(uiState.subscriptions) { item ->
-                        SubscriptionItem(subscription = item) {
-                            onChannelClick(item.channelId)
-                        }
+    Column {
+        FilterComponent(
+            searchQuery = searchQuery,
+            sortOption = sortOption,
+            onSearchClick = { isSearchSheetVisible = true },
+            onSortClick = { isSortSheetVisible = true }
+        )
+
+        if (subscriptions.isEmpty()) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "No subscriptions found.")
+            }
+        } else {
+            LazyColumn {
+                items(subscriptions, key = { it.channelId }) { item ->
+                    SubscriptionItem(subscription = item) {
+                        onChannelClick(item.channelId)
                     }
                 }
             }
         }
+    }
 
-        if (isSearchSheetVisible) {
-            ModalBottomSheet(
-                onDismissRequest = { isSearchSheetVisible = false },
-                sheetState = searchSheetState,
-                content = {
-                    SearchBottomSheet(
-                        currentQuery = uiState.searchQuery,
-                        onSearch = {
-                            onSearchChange(it)
-                        },
-                        onClose = { isSearchSheetVisible = false }
-                    )
-                }
-            )
-        }
+    if (isSearchSheetVisible) {
+        ModalBottomSheet(
+            onDismissRequest = { isSearchSheetVisible = false },
+            sheetState = searchSheetState,
+            content = {
+                SearchBottomSheet(
+                    currentQuery = searchQuery,
+                    onSearch = { onSearchChange(it) },
+                    onClose = { isSearchSheetVisible = false }
+                )
+            }
+        )
+    }
 
-        if (isSortSheetVisible) {
-            ModalBottomSheet(
-                onDismissRequest = { isSortSheetVisible = false },
-                sheetState = sortSheetState,
-                content = {
-                    SortBottomSheet(
-                        selected = uiState.sortOption,
-                        onSelect = {
-                            onSortChange(it)
-                        },
-                        onClose = { isSortSheetVisible = false }
-                    )
-                }
-            )
-        }
+    if (isSortSheetVisible) {
+        ModalBottomSheet(
+            onDismissRequest = { isSortSheetVisible = false },
+            sheetState = sortSheetState,
+            content = {
+                SortBottomSheet(
+                    selected = sortOption,
+                    onSelect = { onSortChange(it) },
+                    onClose = { isSortSheetVisible = false }
+                )
+            }
+        )
     }
 }
 
@@ -189,7 +209,7 @@ internal fun SubscriptionItem(subscription: SubscriptionItem, onClick: () -> Uni
 }
 
 @Composable
-fun FilterComponent(
+internal fun FilterComponent(
     searchQuery: String,
     sortOption: SortOption,
     onSearchClick: () -> Unit,
@@ -216,7 +236,7 @@ fun FilterComponent(
 }
 
 @Composable
-fun SearchBottomSheet(
+internal fun SearchBottomSheet(
     currentQuery: String,
     onSearch: (String) -> Unit,
     onClose: () -> Unit
@@ -252,7 +272,7 @@ fun SearchBottomSheet(
 }
 
 @Composable
-fun SortBottomSheet(
+internal fun SortBottomSheet(
     selected: SortOption,
     onSelect: (SortOption) -> Unit,
     onClose: () -> Unit
@@ -291,7 +311,7 @@ fun SortBottomSheet(
 @Preview(showBackground = true)
 @Composable
 fun FeedScreenPreview() {
-    FeedScreenContent(uiState = FeedUiState(subscriptions = listOf(
+    FeedScreenContent(uiState = FeedUiState.Success(subscriptions = listOf(
         SubscriptionItem(
             channelId = "cid1",
             title = "Sample Channel 1"
@@ -306,5 +326,5 @@ fun FeedScreenPreview() {
 @Preview(showBackground = true, name = "Empty Feed")
 @Composable
 fun FeedScreenEmptyPreview() {
-    FeedScreenContent(uiState = FeedUiState(subscriptions = emptyList()))
+    FeedScreenContent(uiState = FeedUiState.Success(subscriptions = emptyList()))
 }

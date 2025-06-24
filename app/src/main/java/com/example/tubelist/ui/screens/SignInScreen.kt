@@ -31,15 +31,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.tubelist.R
-import com.example.tubelist.model.auth.AuthState
-import com.example.tubelist.model.auth.AuthViewModel
 import com.example.tubelist.ui.components.LoadingComponent
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SignInScreen(
-    authViewModel: AuthViewModel = koinViewModel(),
     modifier: Modifier = Modifier,
+    authViewModel: SignInViewModel = koinViewModel(),
     onSignIn: () -> Unit
 ) {
     val context = LocalContext.current
@@ -118,7 +116,7 @@ internal fun SignInButton(onClick: () -> Unit) {
             imageVector = ImageVector.vectorResource(id = R.drawable.google_g),
             contentDescription = "Google logo",
             modifier = Modifier.size(24.dp),
-            tint = Color.Unspecified // Important to show original colors
+            tint = Color.Unspecified
         )
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
         Text("Sign in with Google")

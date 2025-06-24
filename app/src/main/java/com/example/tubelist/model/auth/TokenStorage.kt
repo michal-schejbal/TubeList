@@ -1,4 +1,4 @@
-package com.example.tubelist.app.tokens
+package com.example.tubelist.model.auth
 
 object TokenStorage : ITokenStorage {
     private val ID_TOKEN = "id_token"

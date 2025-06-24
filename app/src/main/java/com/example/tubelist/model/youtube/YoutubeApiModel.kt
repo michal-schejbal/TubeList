@@ -1,47 +1,9 @@
 package com.example.tubelist.model.youtube
 
-import com.google.gson.annotations.SerializedName
-
-data class SubscriptionResponse(
-    @SerializedName("items") val items: List<SubscriptionItemDto>
-)
-
-data class SubscriptionItemDto(
-    @SerializedName("snippet") val snippet: SnippetDto
-)
-
-data class SnippetDto(
-    val title: String,
-    val thumbnails: Thumbnails,
-    val resourceId: ResourceIdDto
-)
-
 data class Thumbnail(
     val url: String?,
     val width: Int? = null,
     val height: Int? = null
-)
-
-data class ResourceIdDto(val channelId: String)
-
-
-
-data class ChannelResponse(
-    val items: List<ChannelItem>
-)
-
-data class ChannelItem(
-    val id: String,
-    val snippet: ChannelSnippet,
-    val contentDetails: ChannelContentDetails,
-    val statistics: ChannelStatistics
-)
-
-data class ChannelSnippet(
-    val title: String,
-    val publishedAt: String,
-    val description: String,
-    val thumbnails: Thumbnails
 )
 
 data class Thumbnails(
@@ -50,15 +12,56 @@ data class Thumbnails(
     val high: Thumbnail? = null
 )
 
-data class ChannelContentDetails(
-    val relatedPlaylists: RelatedPlaylists
+/**
+ * SubscriptionResponse DTOs
+ */
+data class SubscriptionResponse(
+    val items: List<SubscriptionResponseItem>
 )
 
-data class RelatedPlaylists(
+data class SubscriptionResponseItem(
+    val snippet: SubscriptionResponseSnippet
+)
+
+data class SubscriptionResponseSnippet(
+    val title: String,
+    val thumbnails: Thumbnails,
+    val resourceId: SubscriptionResponseResourceId
+)
+
+data class SubscriptionResponseResourceId(val channelId: String)
+
+
+/**
+ * ChannelResponse DTOs
+ */
+data class ChannelResponse(
+    val items: List<ChannelResponseItem>
+)
+
+data class ChannelResponseItem(
+    val id: String,
+    val snippet: ChannelResponseSnippet,
+    val contentDetails: ChannelResponseItemContentDetails,
+    val statistics: ChannelResponseItemStatistics
+)
+
+data class ChannelResponseSnippet(
+    val title: String,
+    val publishedAt: String,
+    val description: String,
+    val thumbnails: Thumbnails
+)
+
+data class ChannelResponseItemContentDetails(
+    val relatedPlaylists: ChannelResponseItemRelatedPlaylists
+)
+
+data class ChannelResponseItemRelatedPlaylists(
     val uploads: String
 )
 
-data class ChannelStatistics(
+data class ChannelResponseItemStatistics(
     val viewCount: String,
     val subscriberCount: String,
     val hiddenSubscriberCount: Boolean,

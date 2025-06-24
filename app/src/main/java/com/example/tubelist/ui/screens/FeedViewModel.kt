@@ -7,21 +7,24 @@ import com.example.tubelist.model.youtube.SubscriptionItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlin.coroutines.cancellation.CancellationException
 
 enum class SortOption {
     RELEVANCE, ALPHABETICAL
 }
 
-data class FeedUiState(
-    val isLoading: Boolean = false,
-    val subscriptions: List<SubscriptionItem> = emptyList(),
-    val error: String? = null,
-    val sortOption: SortOption = SortOption.RELEVANCE,
-    val searchQuery: String = ""
-)
+sealed class FeedUiState {
+    data object Loading : FeedUiState()
+    data class Success(
+        val subscriptions: List<SubscriptionItem> = emptyList(),
+        val sortOption: SortOption = SortOption.RELEVANCE,
+        val searchQuery: String = ""
+    ) : FeedUiState()
+    data class Error(val message: String?) : FeedUiState()
+}
 
 class FeedViewModel(private val repository: IYoutubeRepository) : ViewModel() {
-    private val _uiState = MutableStateFlow(FeedUiState())
+    private val _uiState = MutableStateFlow<FeedUiState>(FeedUiState.Loading)
     val uiState: StateFlow<FeedUiState> = _uiState
 
     private var originalList: List<SubscriptionItem> = emptyList()
@@ -32,42 +35,46 @@ class FeedViewModel(private val repository: IYoutubeRepository) : ViewModel() {
 
     fun getSubscriptions() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
+            _uiState.value = FeedUiState.Loading
             try {
                 originalList = repository.getSubscriptions()
-                filter()
+                _uiState.value = FeedUiState.Success(subscriptions = originalList)
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(isLoading = false, error = e.message)
+                if (e is CancellationException) throw e
+                _uiState.value = FeedUiState.Error(e.message)
             }
         }
     }
 
     fun setSortOption(option: SortOption) {
-        _uiState.value = _uiState.value.copy(sortOption = option)
-        filter()
+        val currentState = _uiState.value
+        if (currentState is FeedUiState.Success) {
+            _uiState.value = currentState.copy(sortOption = option)
+            filter()
+        }
     }
 
     fun setSearchQuery(query: String) {
-        _uiState.value = _uiState.value.copy(searchQuery = query)
-        filter()
+        val currentState = _uiState.value
+        if (currentState is FeedUiState.Success) {
+            _uiState.value = currentState.copy(searchQuery = query)
+            filter()
+        }
     }
 
     private fun filter() {
-        val currentQuery = _uiState.value.searchQuery
-        val currentSort = _uiState.value.sortOption
+        val currentState = _uiState.value
+        if (currentState is FeedUiState.Success) {
+            val filtered = originalList.filter {
+                it.title.contains(currentState.searchQuery, ignoreCase = true)
+            }
 
-        val filtered = originalList.filter {
-            it.title.contains(currentQuery, ignoreCase = true)
+            val sorted = when (currentState.sortOption) {
+                SortOption.RELEVANCE -> filtered
+                SortOption.ALPHABETICAL -> filtered.sortedBy { it.title.lowercase() }
+            }
+
+            _uiState.value = currentState.copy(subscriptions = sorted)
         }
-
-        val sorted = when (currentSort) {
-            SortOption.RELEVANCE -> filtered
-            SortOption.ALPHABETICAL -> filtered.sortedBy { it.title.lowercase() }
-        }
-
-        _uiState.value = _uiState.value.copy(
-            subscriptions = sorted,
-            isLoading = false
-        )
     }
 }

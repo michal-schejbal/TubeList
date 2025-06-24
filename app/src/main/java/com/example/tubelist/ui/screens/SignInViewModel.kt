@@ -1,10 +1,12 @@
-package com.example.tubelist.model.auth
+package com.example.tubelist.ui.screens
 
 import android.app.Activity
 import android.app.PendingIntent
 import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tubelist.model.auth.AuthResult
+import com.example.tubelist.model.auth.IAuthManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +19,7 @@ sealed interface AuthState {
     data class Error(val message: String) : AuthState
 }
 
-class AuthViewModel(private val auth: IAuthManager) : ViewModel() {
+class SignInViewModel(private val auth: IAuthManager) : ViewModel() {
     private val _uiState = MutableStateFlow<AuthState>(AuthState.Idle)
     val uiState = _uiState.asStateFlow()
 
@@ -38,10 +40,7 @@ class AuthViewModel(private val auth: IAuthManager) : ViewModel() {
     }
 
     fun handleAuthorizationResponse(intent: Intent?, activity: Activity) {
-        // We've received the result from the UI, process it.
         auth.handleAuthorizationResult(intent, activity)
-
-        // Clear the pending intent so it's not re-launched on config change
         _pendingIntent.value = null
     }
 }

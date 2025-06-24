@@ -1,4 +1,4 @@
-package com.example.tubelist.app.tokens
+package com.example.tubelist.model.auth
 
 interface ITokenStorage {
     fun getIdToken(): String?
