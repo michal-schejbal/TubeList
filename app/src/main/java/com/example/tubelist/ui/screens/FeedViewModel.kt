@@ -2,6 +2,7 @@ package com.example.tubelist.ui.screens
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tubelist.app.runCatchingCancellable
 import com.example.tubelist.model.youtube.IYoutubeRepository
 import com.example.tubelist.model.youtube.SubscriptionItem
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,14 +14,14 @@ enum class SortOption {
     RELEVANCE, ALPHABETICAL
 }
 
-sealed class FeedUiState {
-    data object Loading : FeedUiState()
+sealed interface FeedUiState {
+    data object Loading : FeedUiState
     data class Success(
         val subscriptions: List<SubscriptionItem> = emptyList(),
         val sortOption: SortOption = SortOption.RELEVANCE,
         val searchQuery: String = ""
-    ) : FeedUiState()
-    data class Error(val message: String?) : FeedUiState()
+    ) : FeedUiState
+    data class Error(val message: String?) : FeedUiState
 }
 
 class FeedViewModel(private val repository: IYoutubeRepository) : ViewModel() {
@@ -36,11 +37,12 @@ class FeedViewModel(private val repository: IYoutubeRepository) : ViewModel() {
     fun getSubscriptions() {
         viewModelScope.launch {
             _uiState.value = FeedUiState.Loading
-            try {
-                originalList = repository.getSubscriptions()
+            runCatchingCancellable {
+                repository.getSubscriptions()
+            }.onSuccess { list ->
+                originalList = list
                 _uiState.value = FeedUiState.Success(subscriptions = originalList)
-            } catch (e: Exception) {
-                if (e is CancellationException) throw e
+            }.onFailure { e ->
                 _uiState.value = FeedUiState.Error(e.message)
             }
         }

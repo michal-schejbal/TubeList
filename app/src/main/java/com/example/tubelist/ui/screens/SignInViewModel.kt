@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tubelist.app.runCatchingCancellable
 import com.example.tubelist.model.auth.AuthResult
 import com.example.tubelist.model.auth.IAuthManager
 import kotlinx.coroutines.Dispatchers
@@ -29,12 +30,16 @@ class SignInViewModel(private val auth: IAuthManager) : ViewModel() {
     fun signIn(context: Activity) {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.value = AuthState.Loading
-            val result = auth.signIn(context)
-
-            when (result) {
-                is AuthResult.Error -> _uiState.value = AuthState.Error(result.message)
-                is AuthResult.Success -> _uiState.value = AuthState.Success(result.token)
-                is AuthResult.ResolutionRequired -> _pendingIntent.value = result.intent
+            runCatchingCancellable {
+                auth.signIn(context)
+            }.onSuccess { result ->
+                when (result) {
+                    is AuthResult.Error -> _uiState.value = AuthState.Error(result.message)
+                    is AuthResult.Success -> _uiState.value = AuthState.Success(result.token)
+                    is AuthResult.ResolutionRequired -> _pendingIntent.value = result.intent
+                }
+            }.onFailure { e ->
+                _uiState.value = AuthState.Error(e.message ?: "Unexpected error")
             }
         }
     }

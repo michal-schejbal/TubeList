@@ -3,6 +3,7 @@ package com.example.tubelist.ui.screens
 import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tubelist.app.runCatchingCancellable
 import com.example.tubelist.model.auth.IAuthManager
 import com.example.tubelist.model.user.IUserRepository
 import com.example.tubelist.model.user.User
@@ -20,7 +21,11 @@ class ProfileViewModel(private val repository: IUserRepository, private val auth
 
     fun getUser() {
         viewModelScope.launch {
-            _user.value = repository.getUser()
+            runCatchingCancellable {
+                repository.getUser()
+            }.onSuccess {
+                _user.value = it
+            }
         }
     }
 

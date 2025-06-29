@@ -12,7 +12,7 @@
 
 ## 🧰 Tech Stack
 
-- **Architecture**: MVVM · StateFlow · Repository Pattern · Feature-first modularity · Clean separation of UI, domain, and data concerns
+- **Architecture**: MVVM · StateFlow · Repository Pattern · Adapter Pattern · Feature-first modularity · Clean separation of UI, domain, and data concerns
 - **UI**: Jetpack Compose (Material 3) · Scaffold layout · Bottom sheets · LazyColumn · Coil for image loading · Responsive previews
 - **Auth**: CredentialsManager (Android Identity API) · Google Sign-In with OAuth 2.0 · ID token and access token handling · TokenAuthenticator with retry logic
 - **Network**: Retrofit · OkHttp with custom AuthInterceptor · YouTube Data API v3 · DTOs mapping for subscriptions and channels
